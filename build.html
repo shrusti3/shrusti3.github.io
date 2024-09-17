@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuildWatch - Construction Monitoring</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            background-color: #1a1a1a;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .logo svg {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            fill: #8a2be2;
+        }
+        .login-container {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 400px;
+            margin: 100px auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        input[type="text"], input[type="password"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3a3a3a;
+            color: white;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #8a2be2;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #9a3cf1;
+        }
+        .main-content {
+            display: none;
+        }
+        .upload-section, .analysis-section, .history-section {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #3a3a3a;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .progress {
+            width: 0;
+            height: 20px;
+            background-color: #8a2be2;
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #2a2a2a;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown-content a:hover {
+            background-color: #3a3a3a;
+        }
+        #uploaded-image {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 5.69l5 4.5V18h-2v-6H9v6H7v-7.81l5-4.5M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/>
+            </svg>
+            BuildWatch
+        </div>
+        
+        <div class="login-container">
+            <div class="logo" style="justify-content: center;">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 5.69l5 4.5V18h-2v-6H9v6H7v-7.81l5-4.5M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/>
+                </svg>
+            </div>
+            <h1>Welcome to BuildWatch</h1>
+            <input type="text" placeholder="Username" required>
+            <input type="password" placeholder="Password" required>
+            <button onclick="showMainContent()">Login</button>
+            <p style="text-align: center; margin-top: 20px;">New user? <a href="#" style="color: #8a2be2;">Sign up</a></p>
+        </div>
+
+        <div class="main-content">
+            <h2>Construction Monitoring Dashboard</h2>
+            
+            <div class="upload-section">
+                <h3>Upload Construction Site Image</h3>
+                <p>Please upload an image of your construction site and provide details about the current stage.</p>
+                <input type="file" accept="image/*" id="image-upload" onchange="previewImage(event)">
+                <select id="construction-stage" style="margin-top: 10px;">
+                    <option value="">Select construction stage</option>
+                    <option value="foundation">Foundation</option>
+                    <option value="superstructure">Superstructure</option>
+                    <option value="furnishing">Furnishing</option>
+                    <option value="interiors">Interiors</option>
+                </select>
+                <textarea id="project-details" placeholder="Enter details about the construction project" rows="4" style="margin-top: 10px;"></textarea>
+                <button onclick="analyzeImage()" style="margin-top: 10px;">Upload and Analyze</button>
+                <img id="uploaded-image" src="" alt="Uploaded construction site image">
+            </div>
+
+            <div class="analysis-section">
+                <h3>Construction Analysis</h3>
+                <div id="analysis-result">
+                    <p>Upload an image to see the analysis here.</p>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress" id="progress-bar" style="width: 0%;"></div>
+                </div>
+                <p>Construction Progress: <span id="progress-percentage">0%</span></p>
+            </div>
+
+            <div class="history-section">
+                <h3>Upload History</h3>
+                <div class="dropdown">
+                    <button>View History</button>
+                    <div class="dropdown-content">
+                        <a href="#" onclick="showHistory('latest')">Latest Uploads</a>
+                        <a href="#" onclick="showHistory('week')">Last Week</a>
+                        <a href="#" onclick="showHistory('month')">Last Month</a>
+                    </div>
+                </div>
+                <table id="history-table" style="margin-top: 20px;">
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Stage</th>
+                        <th>Progress</th>
+                    </tr>
+                    <!-- Table rows will be dynamically added here -->
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMainContent() {
+            document.querySelector('.login-container').style.display = 'none';
+            document.querySelector('.main-content').style.display = 'block';
+        }
+
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const output = document.getElementById('uploaded-image');
+                output.src = reader.result;
+                output.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function analyzeImage() {
+            const imageUpload = document.getElementById('image-upload');
+            const constructionStage = document.getElementById('construction-stage');
+            const projectDetails = document.getElementById('project-details');
+            const analysisResult = document.getElementById('analysis-result');
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercentage = document.getElementById('progress-percentage');
+            
+            if (!imageUpload.files[0] || !constructionStage.value || !projectDetails.value) {
+                alert('Please fill in all fields and upload an image.');
+                return;
+            }
+
+            analysisResult.innerHTML = '<p>Analyzing image...</p>';
+            
+            setTimeout(() => {
+                const stages = ['Foundation', 'Superstructure', 'Furnishing', 'Interiors','Others'];
+                const activities = ['Excavation', 'Wall construction', 'Electrical wiring', 'Painting'];
+                const randomStage = stages[Math.floor(Math.random() * stages.length)];
+                const randomActivity = activities[Math.floor(Math.random() * activities.length)];
+                const randomProgress = Math.floor(Math.random() * 100);
+
+                analysisResult.innerHTML = `
+                    <h4>Analysis Complete</h4>
+                    <p>Stage: ${randomStage}</p>
+                    <p>Activity: ${randomActivity} in progress</p>
+                    <p>Estimated completion: ${randomProgress}%</p>
+                `;
+                
+                progressBar.style.width = `${randomProgress}%`;
+                progressPercentage.textContent = `${randomProgress}%`;
+                
+                // Add to history
+                addToHistory(randomStage, randomProgress);
+            }, 2000);
+        }
+
+        function addToHistory(stage, progress) {
+            const historyTable = document.getElementById('history-table');
+            const newRow = historyTable.insertRow(1);
+            const date = new Date();
+            newRow.innerHTML = `
+                <td>${date.toLocaleDateString('en-GB')}</td>
+                <td>${date.toLocaleTimeString()}</td>
+                <td>${stage}</td>
+                <td>${progress}%</td>
+            `;
+        }
+
+        function showHistory(period) {
+            // This function would typically fetch data from a server
+            // For this example, we'll just clear the table and add some dummy data
+            const historyTable = document.getElementById('history-table');
+            // Clear existing rows
+            while (historyTable.rows.length > 1) {
+                historyTable.deleteRow(1);
+            }
+            // Add dummy data
+            for (let i = 0; i < 5; i++) {
+                addToHistory(['Foundation', 'Superstructure', 'Furnishing', 'Interiors'][Math.floor(Math.random() * 4)], 
+                             Math.floor(Math.random() * 100));
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
